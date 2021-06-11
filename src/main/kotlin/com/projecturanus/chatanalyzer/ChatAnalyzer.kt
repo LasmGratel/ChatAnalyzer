@@ -8,6 +8,7 @@ import org.bson.Document
 import org.litote.kmongo.KMongo
 import java.nio.file.Files
 import java.nio.file.Paths
+import java.nio.file.StandardOpenOption
 import java.time.LocalDateTime
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.io.path.nameWithoutExtension
@@ -23,6 +24,7 @@ fun main() = runBlocking {
         return@runBlocking
     }
     val jobs = arrayListOf<Job>()
+    val writer = Files.newBufferedWriter(Paths.get("all_player_chats.txt"), StandardOpenOption.CREATE, StandardOpenOption.WRITE)
     for (logFile in Files.list(logPath)) {
         jobs += GlobalScope.launch {
             if (regex.matches(logFile.fileName?.toString()!!)) {
@@ -33,7 +35,7 @@ fun main() = runBlocking {
                     logData.chats.asSequence()
                         .map {
                             if (it.name != "") {
-                                println(it.content)
+                                writer.appendLine(it.content)
                             }
                             Chat(it.name, it.content, LocalDateTime.parse("${date}T${it.time}"))
                         })
@@ -43,6 +45,7 @@ fun main() = runBlocking {
         }
     }
     jobs.joinAll()
+    writer.close()
     jobs.clear()
 
     System.setProperty("org.litote.mongo.test.mapping.service", "org.litote.kmongo.jackson.JacksonClassMappingTypeService")

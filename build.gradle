@@ -1,10 +1,15 @@
 plugins {
     id 'java'
+	id 'application'
     id 'org.jetbrains.kotlin.jvm' version '1.4.31'
 }
 
 group 'org.example'
 version '1.0-SNAPSHOT'
+
+application {
+	mainClass = 'com.projecturanus.chatanalyzer.ChatAnalyzerKt'
+}
 
 repositories {
     mavenCentral()
